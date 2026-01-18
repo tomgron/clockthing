@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock Screensaver</title>
+    <!-- Premium Square Tech Font similar to Eurostile -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="clock-container">
+        <div class="clock" id="clock-face">
+            <div class="center-point"></div>
+
+            <!-- Hour Hand - SVG Tapered Shape -->
+            <div class="hand hour-hand" id="hour-hand">
+                <svg class="hand-svg" viewBox="0 0 30 180" preserveAspectRatio="xMidYMax meet">
+                    <!-- Main hand body - tapered from wide base to pointed tip -->
+                    <path class="svg-hand-body"
+                        d="M15 0 L17 10 L19 40 L20 80 L20 150 Q20 170 15 180 Q10 170 10 150 L10 80 L11 40 L13 10 Z" />
+                    <!-- Center stripe accent -->
+                    <path class="svg-hand-stripe"
+                        d="M15 5 L16 15 L17 45 L17.5 85 L17.5 150 Q17.5 168 15 175 Q12.5 168 12.5 150 L12.5 85 L13 45 L14 15 Z" />
+                </svg>
+            </div>
+
+            <!-- Minute Hand - SVG Tapered Shape (longer, thinner) -->
+            <div class="hand minute-hand" id="minute-hand">
+                <svg class="hand-svg" viewBox="0 0 24 260" preserveAspectRatio="xMidYMax meet">
+                    <!-- Main hand body - tapered from wide base to pointed tip -->
+                    <path class="svg-hand-body"
+                        d="M12 0 L14 15 L15 50 L16 100 L16 220 Q16 250 12 260 Q8 250 8 220 L8 100 L9 50 L10 15 Z" />
+                    <!-- Center stripe accent -->
+                    <path class="svg-hand-stripe"
+                        d="M12 5 L13 20 L14 55 L14.5 105 L14.5 218 Q14.5 248 12 255 Q9.5 248 9.5 218 L9.5 105 L10 55 L11 20 Z" />
+                </svg>
+            </div>
+
+            <!-- Second Hand -->
+            <div class="hand second-hand" id="second-hand"></div>
+
+            <div id="ticks-container"></div>
+            <div id="hour-numbers-container"></div>
+            <div id="minute-numbers-container"></div>
+        </div>
+    </div>
+
+    <!-- Theme Switcher UI -->
+    <div class="theme-bar">
+        <div class="theme-option" onclick="setTheme('dark')" title="Night Theme">
+            <div class="theme-preview" style="background: radial-gradient(circle at center, #1e293b, #000000)"></div>
+        </div>
+        <div class="theme-option" onclick="setTheme('light')" title="Glacier Theme">
+            <div class="theme-preview" style="background: radial-gradient(circle at center, #f8fafc, #e2e8f0)"></div>
+        </div>
+    </div>
+
+    <!-- Settings Panel (Only visible in /c mode) -->
+    <div class="settings-panel">
+        <div class="settings-header">
+            <span style="font-weight:600">Appearance</span>
+        </div>
+
+        <div class="settings-scroll-area">
+            <!-- Appearance Section -->
+            <div class="section-title">Appearance</div>
+            <div class="appearance-grid">
+                <!-- Day -->
+                <div class="appearance-card" id="card-light" onclick="selectSettingsTheme('light')">
+                    <div class="preview-box">
+                        <div class="mini-clock-bg bg-day">
+                            <!-- Abstract preview elements -->
+                            <div class="mini-hand hour" style="color:#334155"></div>
+                            <div class="mini-hand min" style="color:#334155"></div>
+                        </div>
+                    </div>
+                    <span class="appearance-label">Day</span>
+                </div>
+
+                <!-- Night -->
+                <div class="appearance-card" id="card-dark" onclick="selectSettingsTheme('dark')">
+                    <div class="preview-box">
+                        <div class="mini-clock-bg bg-night">
+                            <div class="mini-hand hour" style="color:#ccfbf1"></div>
+                            <div class="mini-hand min" style="color:#ccfbf1"></div>
+                        </div>
+                    </div>
+                    <span class="appearance-label">Night</span>
+                </div>
+
+                <!-- System -->
+                <div class="appearance-card" id="card-system" onclick="selectSettingsTheme('system')">
+                    <div class="preview-box">
+                        <div class="mini-clock-bg bg-system">
+                            <div class="mini-hand hour" style="color:#fff; left:48%"></div>
+                            <!-- Split appearance implied by gradient bg -->
+                        </div>
+                    </div>
+                    <span class="appearance-label">System</span>
+                </div>
+            </div>
+
+            <!-- Watch Dial Color Section (Only visible in Light/System mode) -->
+            <div class="dial-color-section" id="dial-color-section">
+                <div class="section-title">Watch Dial Color</div>
+                <div class="dial-scroll-container">
+                    <div class="dial-option" id="dial-#ffffff" onclick="selectDialColor('#ffffff')">
+                        <div class="dial-circle" style="background:#ffffff"></div>
+                        <span class="appearance-label">White</span>
+                    </div>
+                    <div class="dial-option" id="dial-#a5f3fc" onclick="selectDialColor('#a5f3fc')">
+                        <div class="dial-circle" style="background:#a5f3fc"></div>
+                        <span class="appearance-label">Turquoise</span>
+                    </div>
+                    <div class="dial-option" id="dial-#e0f2fe" onclick="selectDialColor('#e0f2fe')">
+                        <div class="dial-circle" style="background:#e0f2fe"></div>
+                        <span class="appearance-label">Glacier</span>
+                    </div>
+                    <div class="dial-option" id="dial-#1e3a8a" onclick="selectDialColor('#1e3a8a')">
+                        <div class="dial-circle" style="background:#1e3a8a"></div>
+                        <span class="appearance-label">Ocean</span>
+                    </div>
+                    <div class="dial-option" id="dial-#ef4444" onclick="selectDialColor('#ef4444')">
+                        <div class="dial-circle" style="background:#ef4444"></div>
+                        <span class="appearance-label">Red</span>
+                    </div>
+                    <div class="dial-option" id="dial-#22c55e" onclick="selectDialColor('#22c55e')">
+                        <div class="dial-circle" style="background:#22c55e"></div>
+                        <span class="appearance-label">Green</span>
+                    </div>
+                    <div class="dial-option" id="dial-#3b82f6" onclick="selectDialColor('#3b82f6')">
+                        <div class="dial-circle" style="background:#3b82f6"></div>
+                        <span class="appearance-label">Blue</span>
+                    </div>
+                    <div class="dial-option" id="dial-#f59e0b" onclick="selectDialColor('#f59e0b')">
+                        <div class="dial-circle" style="background:#f59e0b"></div>
+                        <span class="appearance-label">Amber</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lume Color Section (Only visible in Dark mode) -->
+            <div class="lume-color-section" id="lume-color-section">
+                <div class="section-title">Lume Color</div>
+                <div class="lume-grid">
+                    <div class="lume-swatch" id="color-#ef4444" style="background:#ef4444"
+                        onclick="selectSettingsColor('#ef4444')"></div>
+                    <div class="lume-swatch" id="color-#f97316" style="background:#f97316"
+                        onclick="selectSettingsColor('#f97316')"></div>
+                    <div class="lume-swatch" id="color-#a855f7" style="background:#a855f7"
+                        onclick="selectSettingsColor('#a855f7')"></div>
+                    <div class="lume-swatch" id="color-#ec4899" style="background:#ec4899"
+                        onclick="selectSettingsColor('#ec4899')"></div>
+                    <div class="lume-swatch" id="color-#6ee7b7" style="background:#6ee7b7"
+                        onclick="selectSettingsColor('#6ee7b7')"></div>
+                    <div class="lume-swatch" id="color-#22d3ee" style="background:#22d3ee"
+                        onclick="selectSettingsColor('#22d3ee')"></div>
+                    <div class="lume-swatch" id="color-#fbbf24" style="background:#fbbf24"
+                        onclick="selectSettingsColor('#fbbf24')"></div>
+                    <div class="lume-swatch" id="color-#ffffff" style="background:#ffffff; border:1px solid #ccc"
+                        onclick="selectSettingsColor('#ffffff')"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="settings-footer">
+            <button class="btn btn-secondary" onclick="window.close()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveSettings()">OK</button>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+
+</html>

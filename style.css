@@ -1,0 +1,601 @@
+:root {
+    /* Dynamic Dark Mode Variables */
+    /* 100% more saturated: doubled vibrancy from #440000 to #880000 */
+    --accent-color: #880000;
+    /* Warm vibrant red (iOS red) - enhanced saturation */
+    --accent-rgb: 136, 0, 0;
+
+    /* Dial color (used in light mode) */
+    --dial-color: #e0f2fe;
+    --dial-rgb: 224, 242, 254;
+
+    --bg-color: #000000;
+    --bg-gradient: radial-gradient(circle at center, rgba(var(--accent-rgb), 0.05) 0%, #000000 70%);
+
+    --center-point-bg: #000000;
+    --center-point-border: var(--accent-color);
+
+    --hand-body: var(--accent-color);
+    --hand-border: #000000;
+    /* Contrast against the glow/fill */
+    --hand-shadow: rgba(0, 0, 0, 0.8);
+
+    /* SVG Hand gradient colors - dark mode uses accent color */
+    --hand-gradient-light: color-mix(in srgb, var(--accent-color) 80%, white);
+    --hand-gradient-mid: var(--accent-color);
+    --hand-gradient-dark: color-mix(in srgb, var(--accent-color) 80%, black);
+    --hand-svg-stroke: rgba(0, 0, 0, 0.3);
+    --hand-stripe-color: color-mix(in srgb, var(--accent-color) 60%, black);
+    --hand-stripe-highlight: var(--accent-color);
+
+    --second-hand: #000000;
+    --second-hand-shadow: rgba(0, 0, 0, 0.5);
+
+    /* Minor markers - solid and visible */
+    --marker-minor: rgba(var(--accent-rgb), 0.5);
+
+    --marker-major-bg: var(--accent-color);
+    --marker-major-border: #000000;
+    --marker-shadow: 0 0 1vmin rgba(var(--accent-rgb), 0.6);
+
+    --text-color: var(--accent-color);
+    --text-shadow: 0 0 1.5vmin rgba(var(--accent-rgb), 0.8);
+
+    /* Secondary text (minute numbers) - solid and visible */
+    --text-secondary: rgba(var(--accent-rgb), 0.5);
+
+    /* Dark Mode Casing: Glossy Black/Dark Grey */
+    --hand-casing-gradient: linear-gradient(90deg, #000 0%, #333 40%, #222 60%, #000 100%);
+}
+
+[data-theme="light"] {
+    /* Light Theme with Dial Color Background */
+    --bg-color: var(--dial-color);
+    /* Radial gradient from dial color center to darker edges */
+    --bg-gradient: radial-gradient(circle at center,
+            var(--dial-color) 0%,
+            color-mix(in srgb, var(--dial-color) 68%, black) 50%,
+            color-mix(in srgb, var(--dial-color) 48%, black) 100%);
+
+    --center-point-bg: #ffffff;
+    --center-point-border: rgba(0, 0, 0, 0.3);
+
+    --hand-body: #ffffff;
+    --hand-border: color-mix(in srgb, var(--dial-color) 80%, black);
+    --hand-shadow: color-mix(in srgb, color-mix(in srgb, var(--dial-color) 80%, black) 10%, transparent);
+    /* Hand stripe color - uses dial color darkened */
+    --hand-stripe-color: color-mix(in srgb, var(--dial-color) 70%, black);
+    --hand-stripe-highlight: color-mix(in srgb, var(--dial-color) 85%, black);
+
+    /* SVG Hand gradient colors - light mode uses white/silver */
+    --hand-gradient-light: #ffffff;
+    --hand-gradient-mid: #f0f0f0;
+    --hand-gradient-dark: #c8c8c8;
+    --hand-svg-stroke: rgba(0, 0, 0, 0.1);
+
+    --second-hand: #5a5a5a;
+    /* Silver/gray metallic second hand to match other hands */
+    --second-hand-shadow: rgba(0, 0, 0, 0.15);
+
+    --marker-minor: rgba(255, 255, 255, 0.4);
+    --marker-major-bg: linear-gradient(90deg, #000 0%, #333 40%, #222 60%, #000 100%);
+    --marker-major-border: rgba(0, 0, 0, 0.2);
+    --marker-shadow: 0 0.1vmin 0.3vmin rgba(0, 0, 0, 0.2);
+
+    --text-color: #ffffff;
+    /* White text for contrast on colored dial */
+    --text-shadow: 0 0.1vmin 0.3vmin rgba(0, 0, 0, 0.2);
+    --text-secondary: rgba(255, 255, 255, 0.7);
+
+    /* Light Mode Casing: Silver */
+    --hand-casing-gradient: linear-gradient(90deg, #cbd5e1 0%, #f8fafc 40%, #f1f5f9 60%, #cbd5e1 100%);
+    --center-point-bg-gradient: radial-gradient(circle at 30% 30%, #f1f5f9, #94a3b8);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    background-image: var(--bg-gradient);
+    /* Deep navy night mode */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    /* Michroma matches the 'Eurostile' look of the reference image perfectly */
+    font-family: 'Michroma', sans-serif;
+    color: var(--text-color);
+    transition: background 0.5s ease;
+}
+
+.clock-container {
+    position: relative;
+    width: 90vmin;
+    height: 90vmin;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.clock {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 50%;
+    /* No border or background for the face itself, just the elements */
+}
+
+/* Center Point - Metallic Hub Cap */
+.center-point {
+    width: 2.8vmin;
+    height: 2.8vmin;
+    background: radial-gradient(circle at 35% 35%, #ffffff, #e8e8e8 40%, #c0c0c0 80%, #a0a0a0);
+    border: 0.15vmin solid rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    /* Drop shadow */
+    box-shadow:
+        0 0.15vmin 0.3vmin rgba(0, 0, 0, 0.3),
+        inset 0 0.1vmin 0.2vmin rgba(255, 255, 255, 0.5);
+}
+
+/* Center point inner dot */
+.center-point::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0.8vmin;
+    height: 0.8vmin;
+    background: radial-gradient(circle at 40% 40%, #888, #555);
+    border-radius: 50%;
+    box-shadow: inset 0 0.05vmin 0.1vmin rgba(255, 255, 255, 0.3);
+}
+
+/* Hands - Detailed Pencil / Obelisk Style */
+/* Hands - Container Only */
+/* Removing visual styles from container to allow distinct Hub/Blade shapes */
+.hand {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom center;
+    z-index: 10;
+
+    /* Drop shadow applies to the composite shape */
+    filter: drop-shadow(0 0.2vmin 0.3vmin var(--hand-shadow, rgba(0, 0, 0, 0.25)));
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+/* SVG Hand Styling */
+.hand-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* SVG Hand Body - uses theme colors */
+.svg-hand-body {
+    fill: var(--hand-gradient-mid);
+    stroke: var(--hand-svg-stroke);
+    stroke-width: 0.4;
+}
+
+/* SVG Hand Stripe - accent line down the center */
+.svg-hand-stripe {
+    fill: var(--hand-stripe-color, rgba(0, 0, 0, 0.2));
+    opacity: 0.5;
+}
+
+/* Keep old blade styles hidden (for backwards compat) */
+.hand-blade,
+.hand-hub {
+    display: none;
+}
+
+/* Hour Hand Specifics */
+.hour-hand {
+    width: 4.5vmin;
+    height: 26%;
+    margin-left: -2.25vmin;
+}
+
+/* Minute Hand Specifics */
+.minute-hand {
+    width: 3.5vmin;
+    height: 40%;
+    margin-left: -1.75vmin;
+}
+
+
+
+/* Second Hand */
+.second-hand {
+    width: 0.4vmin;
+    height: 48%;
+    bottom: 50%;
+    /* Center using margin */
+    margin-left: -0.2vmin;
+
+    transform-origin: bottom center;
+    transform-origin: bottom center;
+    background: linear-gradient(90deg, #111, #444, #111);
+    /* Glossy Black */
+    clip-path: none;
+    border-radius: 999px;
+    z-index: 14;
+    filter: drop-shadow(0 0.2vmin 0.4vmin var(--second-hand-shadow));
+    display: block;
+}
+
+/* The Tail (Counterbalance) */
+.second-hand::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 12vmin;
+    height: 12vmin;
+    background: linear-gradient(90deg, #111, #444, #111);
+    border-radius: 0 0 999px 999px;
+    box-shadow: none;
+}
+
+/* Second hand Lollipop - Removed */
+.second-hand::before {
+    display: none;
+}
+
+/* Markers */
+.marker {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    /* Transform handled by JS */
+    border-radius: 0.2vmin;
+    /* Sharper markers too */
+}
+
+.marker.tick-minor {
+    width: 0.25vmin;
+    height: 2vmin;
+    background: var(--marker-minor);
+    opacity: 0.9;
+    box-shadow: 0 0 5px var(--marker-minor);
+    /* Glow */
+    border-radius: 1vmin;
+}
+
+.marker.tick-major {
+    width: 1.2vmin;
+    height: 4.5vmin;
+    /* No border casing - solid color fill */
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+
+    /* No shadow */
+    box-shadow: none;
+
+    /* Ensure ::after positions relative to this */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Colored Lume Insert for Major Ticks - now fills entire marker */
+.marker.tick-major::after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 999px;
+    border: none;
+    box-shadow: inset 0.1vmin 0 0.2vmin rgba(255, 255, 255, 0.3);
+    box-sizing: border-box;
+}
+
+/* Light mode: inner lume uses dial color 20% lighter */
+[data-theme="light"] .marker.tick-major::after {
+    background: color-mix(in srgb, var(--dial-color) 80%, white);
+}
+
+/* Settings Mode Styles */
+body.settings-mode {
+    background: #fbfbfd;
+    /* macOS Settings Background */
+    color: #1d1d1f;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    height: 100vh;
+    overflow: hidden;
+}
+
+body.settings-mode .clock-container,
+body.settings-mode .theme-bar {
+    display: none;
+}
+
+.settings-panel {
+    display: none;
+}
+
+body.settings-mode .settings-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.settings-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e5e5e5;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.settings-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.section-title {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 10px;
+    color: #1d1d1f;
+}
+
+/* Appearance Section */
+.appearance-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+    background: #f2f2f7;
+    padding: 15px;
+    border-radius: 16px;
+}
+
+.appearance-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    gap: 8px;
+}
+
+.preview-box {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.appearance-card:hover .preview-box {
+    transform: scale(1.02);
+}
+
+.appearance-card.selected .preview-box {
+    border-color: #3b82f6;
+    /* Fallback accent */
+    border-color: -webkit-focus-ring-color;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* CSS Mini Clocks for Previews */
+.mini-clock-bg {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.bg-day {
+    background: #eef2f6;
+}
+
+.bg-night {
+    background: #0f172a;
+}
+
+.bg-system {
+    background: linear-gradient(90deg, #eef2f6 50%, #0f172a 50%);
+}
+
+/* Abstract hands for preview */
+.mini-hand {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: currentColor;
+    border-radius: 10px;
+    transform-origin: left center;
+    /* Simplified for mini */
+}
+
+.mini-hand.hour {
+    width: 25%;
+    height: 2px;
+    transform: rotate(-60deg);
+}
+
+.mini-hand.min {
+    width: 35%;
+    height: 2px;
+    transform: rotate(-15deg);
+}
+
+.appearance-label {
+    font-size: 12px;
+    color: #1d1d1f;
+}
+
+/* Watch Dial Section */
+.dial-scroll-container {
+    background: #f2f2f7;
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 25px;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    gap: 15px;
+}
+
+.dial-option {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.dial-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 2px solid transparent;
+    position: relative;
+}
+
+.dial-option.selected .dial-circle {
+    border-color: #000;
+    /* Selected state usually black ring in this style */
+}
+
+/* Lume Colors */
+.lume-grid {
+    background: #1c1c1e;
+    /* Dark section for Lume */
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.lume-swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s;
+}
+
+.lume-swatch:hover {
+    transform: scale(1.1);
+}
+
+.lume-swatch.selected {
+    border-color: white;
+}
+
+/* Actions Footer */
+.settings-footer {
+    padding: 15px 20px;
+    background: #fbfbfd;
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    font-weight: 500;
+}
+
+.btn-secondary {
+    background: white;
+    color: #1d1d1f;
+}
+
+.btn-primary {
+    background: #007aff;
+    color: white;
+    border: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active {
+    background: #0062cc;
+}
+
+/* Minor ticks - Recessed lines */
+.marker.tick-minor {
+    width: 0.3vmin;
+    height: 2vmin;
+    background: var(--marker-minor);
+    /* Bright Cyan/Teal */
+    opacity: 0.8;
+    box-shadow: inset 0 0.1vmin 0.1vmin rgba(0, 0, 0, 0.3);
+    /* Slight recess */
+}
+
+/* Major ticks - styles defined in main section above */
+
+/* Numbers */
+.number {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    text-align: center;
+    color: var(--text-color);
+    /* Lume Color */
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Transform handled by JS */
+    transition: color 0.3s;
+}
+
+.hour-number {
+    font-size: 4vmin;
+    /* Reduced from 5vmin by 20% */
+    /* 3D Text Effect for "Applied" Look */
+    text-shadow: var(--text-shadow);
+    /* Subtle glow */
+    /* Note: true 3D text (extrusion) is hard in CSS, but this shadow + color simulates a raised lume-filled number */
+}
+
+.minute-number {
+    font-size: 2.5vmin;
+    font-weight: 500;
+    color: var(--text-secondary);
+    /* Slightly darker teal for outer ring */
+    opacity: 0.9;
+    text-shadow: 0 0.1vmin 0.2vmin rgba(0, 0, 0, 0.3);
+}
