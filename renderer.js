@@ -1,13 +1,19 @@
-let ipcRenderer;
-try {
-    const electron = require('electron');
-    ipcRenderer = electron.ipcRenderer;
-} catch (e) {
+window.onerror = function(msg, url, line, col, error) {
+   console.log("Renderer Error: " + msg + " at " + line + ":" + col);
+};
+window.addEventListener('unhandledrejection', function(event) {
+   console.log("Unhandled Promise Rejection: " + event.reason);
+});
+
+let electronApi;
+if (window.api) {
+    electronApi = window.api;
+} else {
     // Browser mock for UI testing
-    ipcRenderer = {
-        invoke: () => Promise.resolve({}),
-        send: () => { },
-        on: () => { }
+    electronApi = {
+        getSettings: () => Promise.resolve({}),
+        saveSettings: () => { },
+        quitApp: () => { }
     };
 }
 
@@ -111,6 +117,7 @@ function initFace() {
 // Interaction Handler
 let initialMouse = null;
 const MOUSE_THRESHOLD = 10;
+const launchTime = Date.now();
 // Mouse move listener moved to init logic below
 
 
@@ -132,7 +139,7 @@ const isSettingsMode = urlParams.get('mode') === 'settings';
 
 if (isSettingsMode) {
     document.body.classList.add('settings-mode');
-    ipcRenderer.invoke('get-settings').then(settings => {
+    electronApi.getSettings().then(settings => {
         if (settings) {
             if (settings.theme) selectSettingsTheme(settings.theme);
             if (settings.color) selectSettingsColor(settings.color);
@@ -146,7 +153,7 @@ if (isSettingsMode) {
     });
 } else {
     // Normal Mode
-    ipcRenderer.invoke('get-settings').then(settings => {
+    electronApi.getSettings().then(settings => {
         let theme = 'dark';
         let color = '#cc2222';
         let dialColor = '#e0f2fe';
@@ -191,14 +198,11 @@ function selectSettingsTheme(theme) {
 function selectSettingsColor(color) {
     currentSettingsColor = color;
     // Update UI
-    document.querySelectorAll('.lume-swatch').forEach(el => {
-        el.classList.remove('selected');
-        el.style.boxShadow = 'none';
-    });
-    const swatch = document.getElementById(`color-${color}`);
-    if (swatch) {
-        swatch.classList.add('selected');
-        swatch.style.boxShadow = `0 0 10px ${color}`;
+    document.querySelectorAll('.lume-option').forEach(el => el.classList.remove('selected'));
+    
+    const option = document.getElementById(`color-${color}`);
+    if (option) {
+        option.classList.add('selected');
     }
     setAccentColor(color);
 }
@@ -263,7 +267,7 @@ function hexToRgb(hex) {
 }
 
 function saveSettings() {
-    ipcRenderer.send('save-settings', {
+    electronApi.saveSettings({
         theme: currentSettingsTheme,
         color: currentSettingsColor,
         dialColor: currentSettingsDialColor
@@ -285,15 +289,18 @@ if (!isSettingsMode) {
             e.preventDefault();
             return;
         }
-        ipcRenderer.send('quit-app');
+        electronApi.quitApp();
     });
 
     document.addEventListener('mousedown', (e) => {
         if (e.target.closest('.theme-bar')) return;
-        ipcRenderer.send('quit-app');
+        electronApi.quitApp();
     });
 
     document.addEventListener('mousemove', (e) => {
+        // Grace period of 500ms to ignore initial jitter
+        if (Date.now() - launchTime < 500) return;
+
         if (!initialMouse) {
             initialMouse = { x: e.screenX, y: e.screenY };
             return;
@@ -302,7 +309,7 @@ if (!isSettingsMode) {
         const dy = Math.abs(e.screenY - initialMouse.y);
 
         if (dx > MOUSE_THRESHOLD || dy > MOUSE_THRESHOLD) {
-            ipcRenderer.send('quit-app');
+            electronApi.quitApp();
         }
     });
 

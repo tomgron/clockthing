@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
     <title>Clock Screensaver</title>
     <!-- Premium Square Tech Font similar to Eurostile -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style_theme.css">
 </head>
 
 <body>
@@ -50,15 +52,7 @@
         </div>
     </div>
 
-    <!-- Theme Switcher UI -->
-    <div class="theme-bar">
-        <div class="theme-option" onclick="setTheme('dark')" title="Night Theme">
-            <div class="theme-preview" style="background: radial-gradient(circle at center, #1e293b, #000000)"></div>
-        </div>
-        <div class="theme-option" onclick="setTheme('light')" title="Glacier Theme">
-            <div class="theme-preview" style="background: radial-gradient(circle at center, #f8fafc, #e2e8f0)"></div>
-        </div>
-    </div>
+    <!-- Theme Switcher UI (Removed per Request) -->
 
     <!-- Settings Panel (Only visible in /c mode) -->
     <div class="settings-panel">
@@ -147,23 +141,39 @@
             <!-- Lume Color Section (Only visible in Dark mode) -->
             <div class="lume-color-section" id="lume-color-section">
                 <div class="section-title">Lume Color</div>
-                <div class="lume-grid">
-                    <div class="lume-swatch" id="color-#ef4444" style="background:#ef4444"
-                        onclick="selectSettingsColor('#ef4444')"></div>
-                    <div class="lume-swatch" id="color-#f97316" style="background:#f97316"
-                        onclick="selectSettingsColor('#f97316')"></div>
-                    <div class="lume-swatch" id="color-#a855f7" style="background:#a855f7"
-                        onclick="selectSettingsColor('#a855f7')"></div>
-                    <div class="lume-swatch" id="color-#ec4899" style="background:#ec4899"
-                        onclick="selectSettingsColor('#ec4899')"></div>
-                    <div class="lume-swatch" id="color-#6ee7b7" style="background:#6ee7b7"
-                        onclick="selectSettingsColor('#6ee7b7')"></div>
-                    <div class="lume-swatch" id="color-#22d3ee" style="background:#22d3ee"
-                        onclick="selectSettingsColor('#22d3ee')"></div>
-                    <div class="lume-swatch" id="color-#fbbf24" style="background:#fbbf24"
-                        onclick="selectSettingsColor('#fbbf24')"></div>
-                    <div class="lume-swatch" id="color-#ffffff" style="background:#ffffff; border:1px solid #ccc"
-                        onclick="selectSettingsColor('#ffffff')"></div>
+                <div class="dial-scroll-container">
+                    <div class="dial-option lume-option" id="color-#ffffff" onclick="selectSettingsColor('#ffffff')">
+                        <div class="dial-circle lume-swatch-circle" style="background:#ffffff; border:1px solid #ccc"></div>
+                        <span class="appearance-label">White</span>
+                    </div>
+                    <div class="dial-option lume-option" id="color-#22d3ee" onclick="selectSettingsColor('#22d3ee')">
+                        <div class="dial-circle lume-swatch-circle" style="background:#22d3ee"></div>
+                        <span class="appearance-label">Cyan</span>
+                    </div>
+                    <div class="dial-option lume-option" id="color-#6ee7b7" onclick="selectSettingsColor('#6ee7b7')">
+                        <div class="dial-circle lume-swatch-circle" style="background:#6ee7b7"></div>
+                        <span class="appearance-label">Mint</span>
+                    </div>
+                    <div class="dial-option lume-option" id="color-#ec4899" onclick="selectSettingsColor('#ec4899')">
+                        <div class="dial-circle lume-swatch-circle" style="background:#ec4899"></div>
+                        <span class="appearance-label">Pink</span>
+                    </div>
+                    <div class="dial-option lume-option" id="color-#a855f7" onclick="selectSettingsColor('#a855f7')">
+                        <div class="dial-circle lume-swatch-circle" style="background:#a855f7"></div>
+                        <span class="appearance-label">Purple</span>
+                    </div>
+                    <div class="dial-option lume-option" id="color-#f97316" onclick="selectSettingsColor('#f97316')">
+                        <div class="dial-circle lume-swatch-circle" style="background:#f97316"></div>
+                        <span class="appearance-label">Orange</span>
+                    </div>
+                    <div class="dial-option lume-option" id="color-#ef4444" onclick="selectSettingsColor('#ef4444')">
+                        <div class="dial-circle lume-swatch-circle" style="background:#ef4444"></div>
+                        <span class="appearance-label">Red</span>
+                    </div>
+                    <div class="dial-option lume-option" id="color-#fbbf24" onclick="selectSettingsColor('#fbbf24')">
+                        <div class="dial-circle lume-swatch-circle" style="background:#fbbf24"></div>
+                        <span class="appearance-label">Gold</span>
+                    </div>
                 </div>
             </div>
 

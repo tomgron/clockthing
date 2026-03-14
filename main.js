@@ -16,20 +16,25 @@ ipcMain.on('quit-app', () => {
   app.quit();
 });
 
-ipcMain.on('save-settings', (event, settings) => {
+ipcMain.on('save-settings', async (event, settings) => {
   // We can save to a JSON file in userData
   const configPath = path.join(app.getPath('userData'), 'config.json');
-  fs.writeFileSync(configPath, JSON.stringify(settings));
+  try {
+    await fs.promises.writeFile(configPath, JSON.stringify(settings, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Failed to save settings:', e);
+  }
   // Close window if it was the settings window
   const win = BrowserWindow.fromWebContents(event.sender);
   if (win) win.close();
 });
 
-ipcMain.handle('get-settings', () => {
+ipcMain.handle('get-settings', async () => {
   try {
     const configPath = path.join(app.getPath('userData'), 'config.json');
     if (fs.existsSync(configPath)) {
-      return JSON.parse(fs.readFileSync(configPath));
+      const data = await fs.promises.readFile(configPath, 'utf8');
+      return JSON.parse(data);
     }
   } catch (e) { console.error(e); }
   return { theme: 'dark' }; // default
@@ -45,8 +50,9 @@ function createWindow() {
       resizable: false,
       title: 'Clock Settings',
       webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false
+        nodeIntegration: false,
+        contextIsolation: true,
+        preload: path.join(__dirname, 'preload.js')
       },
       autoHideMenuBar: true
     });
@@ -69,12 +75,17 @@ function createWindow() {
     frame: false,
     transparent: true,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
 
   mainWindow.loadFile('index.html');
+
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    console.log(`[Renderer] ${message} (Line: ${line})`);
+  });
 
   // If in screensaver mode, ensure it's always on top
   if (isScreensaverMode) {
