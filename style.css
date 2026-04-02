@@ -344,11 +344,16 @@ body.settings-mode .settings-panel {
     padding: 15px 20px;
     border-bottom: 1px solid #e5e5e5;
     background: rgba(255, 255, 255, 0.8);
+    -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
+}
+
+.settings-header-title {
+    font-weight: 600;
 }
 
 .settings-scroll-area {
@@ -400,9 +405,9 @@ body.settings-mode .settings-panel {
 }
 
 .appearance-card.selected .preview-box {
-    border-color: #3b82f6;
-    /* Fallback accent */
     border-color: -webkit-focus-ring-color;
+    /* Fallback accent */
+    border-color: #3b82f6;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
 }
 
@@ -434,6 +439,22 @@ body.settings-mode .settings-panel {
     border-radius: 10px;
     transform-origin: left center;
     /* Simplified for mini */
+}
+
+.mini-hand-day {
+    color: #334155;
+}
+
+.mini-hand-night {
+    color: #ccfbf1;
+}
+
+.mini-hand-system {
+    color: #ffffff;
+}
+
+.mini-hand-system-offset {
+    left: 48%;
 }
 
 .mini-hand.hour {
@@ -481,6 +502,37 @@ body.settings-mode .settings-panel {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border: 2px solid transparent;
     position: relative;
+}
+
+.dial-circle[data-swatch="#ffffff"] { background: #ffffff; }
+.dial-circle[data-swatch="#a5f3fc"] { background: #a5f3fc; }
+.dial-circle[data-swatch="#e0f2fe"] { background: #e0f2fe; }
+.dial-circle[data-swatch="#1e3a8a"] { background: #1e3a8a; }
+.dial-circle[data-swatch="#ef4444"] { background: #ef4444; }
+.dial-circle[data-swatch="#22c55e"] { background: #22c55e; }
+.dial-circle[data-swatch="#3b82f6"] { background: #3b82f6; }
+.dial-circle[data-swatch="#f59e0b"] { background: #f59e0b; }
+.dial-circle[data-swatch="#fef3c7"] { background: #fef3c7; }
+.dial-circle[data-swatch="#c4b5fd"] { background: #c4b5fd; }
+.dial-circle[data-swatch="#fbcfe8"] { background: #fbcfe8; }
+.dial-circle[data-swatch="#86efac"] { background: #86efac; }
+.dial-circle[data-swatch="#93c5fd"] { background: #93c5fd; }
+.dial-circle[data-swatch="#fed7aa"] { background: #fed7aa; }
+.dial-circle[data-swatch="#22d3ee"] { background: #22d3ee; }
+.dial-circle[data-swatch="#6ee7b7"] { background: #6ee7b7; }
+.dial-circle[data-swatch="#ec4899"] { background: #ec4899; }
+.dial-circle[data-swatch="#a855f7"] { background: #a855f7; }
+.dial-circle[data-swatch="#f97316"] { background: #f97316; }
+.dial-circle[data-swatch="#fbbf24"] { background: #fbbf24; }
+.dial-circle[data-swatch="#fde047"] { background: #fde047; }
+.dial-circle[data-swatch="#38bdf8"] { background: #38bdf8; }
+.dial-circle[data-swatch="#818cf8"] { background: #818cf8; }
+.dial-circle[data-swatch="#f472b6"] { background: #f472b6; }
+.dial-circle[data-swatch="#34d399"] { background: #34d399; }
+.dial-circle[data-swatch="#fb7185"] { background: #fb7185; }
+.dial-circle[data-swatch-border="#ccc"] {
+    border-color: #ccc;
+    border-width: 1px;
 }
 
 .dial-option.selected .dial-circle {

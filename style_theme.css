@@ -5,6 +5,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: rgba(128, 128, 128, 0.2);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     padding: 1vmin 2vmin;
     border-radius: 3vmin;

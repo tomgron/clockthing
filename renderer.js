@@ -5,8 +5,13 @@ window.addEventListener('unhandledrejection', function(event) {
    console.log("Unhandled Promise Rejection: " + event.reason);
 });
 
-const ALLOWED_THEMES = new Set(['light', 'dark', 'system']);
+const ALLOWED_THEMES = new Set(['light', 'dark']);
 const HEX_COLOR_REGEX = /^#[0-9a-f]{6}$/i;
+const DEFAULT_SETTINGS = {
+    theme: 'dark',
+    color: '#cc2222',
+    dialColor: '#e0f2fe'
+};
 
 function normalizeTheme(theme) {
     return ALLOWED_THEMES.has(theme) ? theme : 'dark';
@@ -26,14 +31,19 @@ function normalizeSettings(settings) {
     };
 }
 
+function getEffectiveSettings(rawSettings) {
+    return normalizeSettings(rawSettings || DEFAULT_SETTINGS);
+}
+
 let electronApi;
 if (window.api) {
     electronApi = window.api;
 } else {
+    console.error('Electron preload bridge is unavailable; settings persistence and IPC are disabled.');
     // Browser mock for UI testing
     electronApi = {
-        getSettings: () => Promise.resolve({}),
-        saveSettings: () => { },
+        getSettings: () => Promise.resolve(DEFAULT_SETTINGS),
+        saveSettings: () => Promise.resolve(DEFAULT_SETTINGS),
         quitApp: () => { }
     };
 }
@@ -145,7 +155,7 @@ const launchTime = Date.now();
 
 // Settings Page Logic
 let currentSettingsTheme = 'dark';
-let currentSettingsColor = '#22d3ee'; // Default teal
+let currentSettingsColor = DEFAULT_SETTINGS.color;
 let currentSettingsDialColor = '#e0f2fe'; // Default glacier
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -155,7 +165,10 @@ const isWindowedMode = urlParams.get('mode') === 'windowed';
 if (isSettingsMode) {
     document.body.classList.add('settings-mode');
     electronApi.getSettings().then(rawSettings => {
-        const settings = normalizeSettings(rawSettings);
+        const settings = getEffectiveSettings(rawSettings);
+        setTheme(settings.theme, false);
+        setAccentColor(settings.color, false);
+        setDialColor(settings.dialColor, false);
         selectSettingsTheme(settings.theme);
         selectSettingsColor(settings.color);
         selectDialColor(settings.dialColor);
@@ -163,19 +176,11 @@ if (isSettingsMode) {
 } else {
     // Normal Mode
     electronApi.getSettings().then(rawSettings => {
-        const fallbackTheme = normalizeTheme(localStorage.getItem('clock-theme'));
-        const fallbackColor = normalizeColor(localStorage.getItem('clock-color'), '#cc2222');
-        const fallbackDialColor = normalizeColor(localStorage.getItem('clock-dial-color'), '#e0f2fe');
+        const settings = getEffectiveSettings(rawSettings);
 
-        const hasPersistedSettings = rawSettings && typeof rawSettings === 'object';
-        const settings = normalizeSettings(rawSettings);
-        const theme = hasPersistedSettings ? settings.theme : fallbackTheme;
-        const color = hasPersistedSettings ? settings.color : fallbackColor;
-        const dialColor = hasPersistedSettings ? settings.dialColor : fallbackDialColor;
-
-        setTheme(theme);
-        setAccentColor(color);
-        setDialColor(dialColor);
+        setTheme(settings.theme);
+        setAccentColor(settings.color);
+        setDialColor(settings.dialColor);
     });
 }
 
@@ -190,14 +195,14 @@ function selectSettingsTheme(theme) {
     // Dial color only matters for light mode
     const dialSection = document.getElementById('dial-color-section');
     if (dialSection) {
-        dialSection.style.display = (theme === 'dark') ? 'none' : 'block';
+        dialSection.style.display = (currentSettingsTheme === 'dark') ? 'none' : 'block';
     }
 
     // Show/hide lume color section based on theme
     // Lume color only matters for dark mode
     const lumeSection = document.getElementById('lume-color-section');
     if (lumeSection) {
-        lumeSection.style.display = (theme === 'dark') ? 'block' : 'none';
+        lumeSection.style.display = (currentSettingsTheme === 'dark') ? 'block' : 'none';
     }
 }
 
@@ -210,55 +215,39 @@ function selectSettingsColor(color) {
     if (option) {
         option.classList.add('selected');
     }
-    setAccentColor(currentSettingsColor);
+    setAccentColor(currentSettingsColor, false);
 }
 
 function selectDialColor(color) {
     currentSettingsDialColor = normalizeColor(color, '#e0f2fe');
     // Update UI
-    document.querySelectorAll('.dial-option').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('.dial-option[data-dial-color]').forEach(el => el.classList.remove('selected'));
     const option = document.getElementById(`dial-${currentSettingsDialColor}`);
     if (option) {
         option.classList.add('selected');
     }
-    setDialColor(currentSettingsDialColor);
+    setDialColor(currentSettingsDialColor, false);
 }
 
-function resolveSystemTheme() {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
-    }
-    return 'light';
-}
-
-function setTheme(theme) {
+function setTheme(theme, persist = true) {
     const normalizedTheme = normalizeTheme(theme);
-    let appliedTheme = normalizedTheme;
-    if (normalizedTheme === 'system') {
-        appliedTheme = resolveSystemTheme();
-    }
-    document.body.setAttribute('data-theme', appliedTheme);
-    localStorage.setItem('clock-theme', normalizedTheme);
+    document.body.setAttribute('data-theme', normalizedTheme);
 }
 
-function setAccentColor(color) {
+function setAccentColor(color, persist = true) {
     const safeColor = normalizeColor(color, '#cc2222');
     const rgb = hexToRgb(safeColor);
     // Set global accent variables
     document.documentElement.style.setProperty('--accent-color', safeColor);
     document.documentElement.style.setProperty('--accent-rgb', rgb);
-
-    // Also save to local storage for quick resume
-    localStorage.setItem('clock-color', safeColor);
 }
 
-function setDialColor(color) {
+function setDialColor(color, persist = true) {
     const safeColor = normalizeColor(color, '#e0f2fe');
     const rgb = hexToRgb(safeColor);
     // Set dial color variables (used in light mode)
     document.documentElement.style.setProperty('--dial-color', safeColor);
     document.documentElement.style.setProperty('--dial-rgb', rgb);
-    localStorage.setItem('clock-dial-color', safeColor);
 }
 
 // Helper to convert hex to rgb for rgba usage
@@ -275,66 +264,75 @@ function hexToRgb(hex) {
         : '239, 68, 68'; // default red fallback
 }
 
-function saveSettings() {
-    electronApi.saveSettings({
+async function saveSettings() {
+    const savedSettings = await electronApi.saveSettings({
         theme: currentSettingsTheme,
         color: currentSettingsColor,
         dialColor: currentSettingsDialColor
     });
+
+    const settings = getEffectiveSettings(savedSettings);
+    setTheme(settings.theme, true);
+    setAccentColor(settings.color, true);
+    setDialColor(settings.dialColor, true);
+
+    window.close();
 }
 
-// Expose to window for HTML access
-window.setTheme = setTheme;
-window.selectSettingsTheme = selectSettingsTheme;
-window.saveSettings = saveSettings;
-window.selectSettingsColor = selectSettingsColor;
-window.selectDialColor = selectDialColor;
+function initSettingsInteractions() {
+    document.querySelectorAll('.appearance-card[data-theme]').forEach((card) => {
+        card.addEventListener('click', () => {
+            selectSettingsTheme(card.dataset.theme);
+        });
+    });
 
-if (!isSettingsMode && !isWindowedMode) {
+    document.querySelectorAll('.dial-option[data-dial-color]').forEach((option) => {
+        option.addEventListener('click', () => {
+            selectDialColor(option.dataset.dialColor);
+        });
+    });
+
+    document.querySelectorAll('.lume-option[data-lume-color]').forEach((option) => {
+        option.addEventListener('click', () => {
+            selectSettingsColor(option.dataset.lumeColor);
+        });
+    });
+
+    const cancelButton = document.getElementById('settings-cancel');
+    if (cancelButton) {
+        cancelButton.addEventListener('click', () => window.close());
+    }
+
+    const okButton = document.getElementById('settings-ok');
+    if (okButton) {
+        okButton.addEventListener('click', saveSettings);
+    }
+}
+
+function bindThemeToggleShortcut() {
     document.addEventListener('keydown', (e) => {
-        if (e.key.toLowerCase() === 't') {
-            const current = document.body.getAttribute('data-theme');
-            setTheme(current === 'light' ? 'dark' : 'light');
-            e.preventDefault();
-            return;
-        }
-        electronApi.quitApp();
+        if (e.key.toLowerCase() !== 't') return;
+
+        const current = document.body.getAttribute('data-theme');
+        setTheme(current === 'light' ? 'dark' : 'light');
+        e.preventDefault();
     });
+}
 
-    document.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.theme-bar')) return;
-        electronApi.quitApp();
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        // Grace period of 500ms to ignore initial jitter
-        if (Date.now() - launchTime < 500) return;
-
-        if (!initialMouse) {
-            initialMouse = { x: e.screenX, y: e.screenY };
-            return;
-        }
-        const dx = Math.abs(e.screenX - initialMouse.x);
-        const dy = Math.abs(e.screenY - initialMouse.y);
-
-        if (dx > MOUSE_THRESHOLD || dy > MOUSE_THRESHOLD) {
-            electronApi.quitApp();
-        }
-    });
-
+function startClockRendering() {
     initFace();
     requestAnimationFrame(updateClock);
+}
+
+if (isSettingsMode) {
+    initSettingsInteractions();
+}
+
+if (!isSettingsMode && !isWindowedMode) {
+    startClockRendering();
 }
 
 if (isWindowedMode) {
-    document.addEventListener('keydown', (e) => {
-        if (e.key.toLowerCase() === 't') {
-            const current = document.body.getAttribute('data-theme');
-            setTheme(current === 'light' ? 'dark' : 'light');
-            e.preventDefault();
-        }
-    });
-
-    initFace();
-    requestAnimationFrame(updateClock);
+    bindThemeToggleShortcut();
+    startClockRendering();
 }

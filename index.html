@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none';">
     <title>Clock Screensaver</title>
     <!-- Premium Square Tech Font similar to Eurostile -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -57,106 +57,93 @@
     <!-- Settings Panel (Only visible in /c mode) -->
     <div class="settings-panel">
         <div class="settings-header">
-            <span style="font-weight:600">Appearance</span>
+            <span class="settings-header-title">Appearance</span>
         </div>
 
         <div class="settings-scroll-area">
-            <!-- Appearance Section -->
-            <div class="section-title">Appearance</div>
             <div class="appearance-grid">
                 <!-- Day -->
-                <div class="appearance-card" id="card-light" onclick="selectSettingsTheme('light')">
+                <div class="appearance-card" id="card-light" data-theme="light">
                     <div class="preview-box">
                         <div class="mini-clock-bg bg-day">
                             <!-- Abstract preview elements -->
-                            <div class="mini-hand hour" style="color:#334155"></div>
-                            <div class="mini-hand min" style="color:#334155"></div>
+                            <div class="mini-hand mini-hand-day hour"></div>
+                            <div class="mini-hand mini-hand-day min"></div>
                         </div>
                     </div>
                     <span class="appearance-label">Day</span>
                 </div>
 
                 <!-- Night -->
-                <div class="appearance-card" id="card-dark" onclick="selectSettingsTheme('dark')">
+                <div class="appearance-card" id="card-dark" data-theme="dark">
                     <div class="preview-box">
                         <div class="mini-clock-bg bg-night">
-                            <div class="mini-hand hour" style="color:#ccfbf1"></div>
-                            <div class="mini-hand min" style="color:#ccfbf1"></div>
+                            <div class="mini-hand mini-hand-night hour"></div>
+                            <div class="mini-hand mini-hand-night min"></div>
                         </div>
                     </div>
                     <span class="appearance-label">Night</span>
                 </div>
-
-                <!-- System -->
-                <div class="appearance-card" id="card-system" onclick="selectSettingsTheme('system')">
-                    <div class="preview-box">
-                        <div class="mini-clock-bg bg-system">
-                            <div class="mini-hand hour" style="color:#fff; left:48%"></div>
-                            <!-- Split appearance implied by gradient bg -->
-                        </div>
-                    </div>
-                    <span class="appearance-label">System</span>
-                </div>
             </div>
 
-            <!-- Watch Dial Color Section (Only visible in Light/System mode) -->
+            <!-- Watch Dial Color Section (Only visible in Light mode) -->
             <div class="dial-color-section" id="dial-color-section">
                 <div class="section-title">Watch Dial Color</div>
                 <div class="dial-scroll-container">
-                    <div class="dial-option" id="dial-#ffffff" onclick="selectDialColor('#ffffff')">
-                        <div class="dial-circle" style="background:#ffffff"></div>
+                    <div class="dial-option" id="dial-#ffffff" data-dial-color="#ffffff">
+                        <div class="dial-circle" data-swatch="#ffffff"></div>
                         <span class="appearance-label">White</span>
                     </div>
-                    <div class="dial-option" id="dial-#a5f3fc" onclick="selectDialColor('#a5f3fc')">
-                        <div class="dial-circle" style="background:#a5f3fc"></div>
+                    <div class="dial-option" id="dial-#a5f3fc" data-dial-color="#a5f3fc">
+                        <div class="dial-circle" data-swatch="#a5f3fc"></div>
                         <span class="appearance-label">Turquoise</span>
                     </div>
-                    <div class="dial-option" id="dial-#e0f2fe" onclick="selectDialColor('#e0f2fe')">
-                        <div class="dial-circle" style="background:#e0f2fe"></div>
+                    <div class="dial-option" id="dial-#e0f2fe" data-dial-color="#e0f2fe">
+                        <div class="dial-circle" data-swatch="#e0f2fe"></div>
                         <span class="appearance-label">Glacier</span>
                     </div>
-                    <div class="dial-option" id="dial-#1e3a8a" onclick="selectDialColor('#1e3a8a')">
-                        <div class="dial-circle" style="background:#1e3a8a"></div>
+                    <div class="dial-option" id="dial-#1e3a8a" data-dial-color="#1e3a8a">
+                        <div class="dial-circle" data-swatch="#1e3a8a"></div>
                         <span class="appearance-label">Ocean</span>
                     </div>
-                    <div class="dial-option" id="dial-#ef4444" onclick="selectDialColor('#ef4444')">
-                        <div class="dial-circle" style="background:#ef4444"></div>
+                    <div class="dial-option" id="dial-#ef4444" data-dial-color="#ef4444">
+                        <div class="dial-circle" data-swatch="#ef4444"></div>
                         <span class="appearance-label">Red</span>
                     </div>
-                    <div class="dial-option" id="dial-#22c55e" onclick="selectDialColor('#22c55e')">
-                        <div class="dial-circle" style="background:#22c55e"></div>
+                    <div class="dial-option" id="dial-#22c55e" data-dial-color="#22c55e">
+                        <div class="dial-circle" data-swatch="#22c55e"></div>
                         <span class="appearance-label">Green</span>
                     </div>
-                    <div class="dial-option" id="dial-#3b82f6" onclick="selectDialColor('#3b82f6')">
-                        <div class="dial-circle" style="background:#3b82f6"></div>
+                    <div class="dial-option" id="dial-#3b82f6" data-dial-color="#3b82f6">
+                        <div class="dial-circle" data-swatch="#3b82f6"></div>
                         <span class="appearance-label">Blue</span>
                     </div>
-                    <div class="dial-option" id="dial-#f59e0b" onclick="selectDialColor('#f59e0b')">
-                        <div class="dial-circle" style="background:#f59e0b"></div>
+                    <div class="dial-option" id="dial-#f59e0b" data-dial-color="#f59e0b">
+                        <div class="dial-circle" data-swatch="#f59e0b"></div>
                         <span class="appearance-label">Amber</span>
                     </div>
-                    <div class="dial-option" id="dial-#fef3c7" onclick="selectDialColor('#fef3c7')">
-                        <div class="dial-circle" style="background:#fef3c7"></div>
+                    <div class="dial-option" id="dial-#fef3c7" data-dial-color="#fef3c7">
+                        <div class="dial-circle" data-swatch="#fef3c7"></div>
                         <span class="appearance-label">Cream</span>
                     </div>
-                    <div class="dial-option" id="dial-#c4b5fd" onclick="selectDialColor('#c4b5fd')">
-                        <div class="dial-circle" style="background:#c4b5fd"></div>
+                    <div class="dial-option" id="dial-#c4b5fd" data-dial-color="#c4b5fd">
+                        <div class="dial-circle" data-swatch="#c4b5fd"></div>
                         <span class="appearance-label">Lavender</span>
                     </div>
-                    <div class="dial-option" id="dial-#fbcfe8" onclick="selectDialColor('#fbcfe8')">
-                        <div class="dial-circle" style="background:#fbcfe8"></div>
+                    <div class="dial-option" id="dial-#fbcfe8" data-dial-color="#fbcfe8">
+                        <div class="dial-circle" data-swatch="#fbcfe8"></div>
                         <span class="appearance-label">Rose</span>
                     </div>
-                    <div class="dial-option" id="dial-#86efac" onclick="selectDialColor('#86efac')">
-                        <div class="dial-circle" style="background:#86efac"></div>
+                    <div class="dial-option" id="dial-#86efac" data-dial-color="#86efac">
+                        <div class="dial-circle" data-swatch="#86efac"></div>
                         <span class="appearance-label">Sage</span>
                     </div>
-                    <div class="dial-option" id="dial-#93c5fd" onclick="selectDialColor('#93c5fd')">
-                        <div class="dial-circle" style="background:#93c5fd"></div>
+                    <div class="dial-option" id="dial-#93c5fd" data-dial-color="#93c5fd">
+                        <div class="dial-circle" data-swatch="#93c5fd"></div>
                         <span class="appearance-label">Sky</span>
                     </div>
-                    <div class="dial-option" id="dial-#fed7aa" onclick="selectDialColor('#fed7aa')">
-                        <div class="dial-circle" style="background:#fed7aa"></div>
+                    <div class="dial-option" id="dial-#fed7aa" data-dial-color="#fed7aa">
+                        <div class="dial-circle" data-swatch="#fed7aa"></div>
                         <span class="appearance-label">Peach</span>
                     </div>
                 </div>
@@ -166,60 +153,60 @@
             <div class="lume-color-section" id="lume-color-section">
                 <div class="section-title">Lume Color</div>
                 <div class="dial-scroll-container">
-                    <div class="dial-option lume-option" id="color-#ffffff" onclick="selectSettingsColor('#ffffff')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#ffffff; border:1px solid #ccc"></div>
+                    <div class="dial-option lume-option" id="color-#ffffff" data-lume-color="#ffffff">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#ffffff" data-swatch-border="#ccc"></div>
                         <span class="appearance-label">White</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#22d3ee" onclick="selectSettingsColor('#22d3ee')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#22d3ee"></div>
+                    <div class="dial-option lume-option" id="color-#22d3ee" data-lume-color="#22d3ee">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#22d3ee"></div>
                         <span class="appearance-label">Cyan</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#6ee7b7" onclick="selectSettingsColor('#6ee7b7')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#6ee7b7"></div>
+                    <div class="dial-option lume-option" id="color-#6ee7b7" data-lume-color="#6ee7b7">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#6ee7b7"></div>
                         <span class="appearance-label">Mint</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#ec4899" onclick="selectSettingsColor('#ec4899')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#ec4899"></div>
+                    <div class="dial-option lume-option" id="color-#ec4899" data-lume-color="#ec4899">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#ec4899"></div>
                         <span class="appearance-label">Pink</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#a855f7" onclick="selectSettingsColor('#a855f7')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#a855f7"></div>
+                    <div class="dial-option lume-option" id="color-#a855f7" data-lume-color="#a855f7">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#a855f7"></div>
                         <span class="appearance-label">Purple</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#f97316" onclick="selectSettingsColor('#f97316')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#f97316"></div>
+                    <div class="dial-option lume-option" id="color-#f97316" data-lume-color="#f97316">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#f97316"></div>
                         <span class="appearance-label">Orange</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#ef4444" onclick="selectSettingsColor('#ef4444')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#ef4444"></div>
+                    <div class="dial-option lume-option" id="color-#ef4444" data-lume-color="#ef4444">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#ef4444"></div>
                         <span class="appearance-label">Red</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#fbbf24" onclick="selectSettingsColor('#fbbf24')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#fbbf24"></div>
+                    <div class="dial-option lume-option" id="color-#fbbf24" data-lume-color="#fbbf24">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#fbbf24"></div>
                         <span class="appearance-label">Gold</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#fde047" onclick="selectSettingsColor('#fde047')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#fde047"></div>
+                    <div class="dial-option lume-option" id="color-#fde047" data-lume-color="#fde047">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#fde047"></div>
                         <span class="appearance-label">Lemon</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#38bdf8" onclick="selectSettingsColor('#38bdf8')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#38bdf8"></div>
+                    <div class="dial-option lume-option" id="color-#38bdf8" data-lume-color="#38bdf8">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#38bdf8"></div>
                         <span class="appearance-label">Ice Blue</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#818cf8" onclick="selectSettingsColor('#818cf8')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#818cf8"></div>
+                    <div class="dial-option lume-option" id="color-#818cf8" data-lume-color="#818cf8">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#818cf8"></div>
                         <span class="appearance-label">Indigo</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#f472b6" onclick="selectSettingsColor('#f472b6')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#f472b6"></div>
+                    <div class="dial-option lume-option" id="color-#f472b6" data-lume-color="#f472b6">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#f472b6"></div>
                         <span class="appearance-label">Magenta</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#34d399" onclick="selectSettingsColor('#34d399')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#34d399"></div>
+                    <div class="dial-option lume-option" id="color-#34d399" data-lume-color="#34d399">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#34d399"></div>
                         <span class="appearance-label">Emerald</span>
                     </div>
-                    <div class="dial-option lume-option" id="color-#fb7185" onclick="selectSettingsColor('#fb7185')">
-                        <div class="dial-circle lume-swatch-circle" style="background:#fb7185"></div>
+                    <div class="dial-option lume-option" id="color-#fb7185" data-lume-color="#fb7185">
+                        <div class="dial-circle lume-swatch-circle" data-swatch="#fb7185"></div>
                         <span class="appearance-label">Coral</span>
                     </div>
                 </div>
@@ -228,8 +215,8 @@
         </div>
 
         <div class="settings-footer">
-            <button class="btn btn-secondary" onclick="window.close()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveSettings()">OK</button>
+            <button class="btn btn-secondary" id="settings-cancel">Cancel</button>
+            <button class="btn btn-primary" id="settings-ok">OK</button>
         </div>
     </div>
 

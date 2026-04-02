@@ -29,6 +29,8 @@
     "files": [
       "main.js",
       "preload.js",
+      "settingsValidation.js",
+      "settingsStore.js",
       "renderer.js",
       "index.html",
       "style.css",
