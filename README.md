@@ -29,6 +29,12 @@ To start the screensaver, run the following command:
 npm start
 ```
 
+To run the clock in normal windowed mode (no auto-quit on mouse movement), run:
+
+```sh
+npm run start:windowed
+```
+
 To quickly verify JavaScript syntax before packaging, run:
 
 ```sh
@@ -47,6 +53,7 @@ Windows screensaver command switches are also supported:
 electron . /s   # full screensaver mode
 electron . /c   # settings dialog
 electron . /p   # preview mode (currently exits)
+electron . --windowed  # normal app window mode
 ```
 
 ## Building

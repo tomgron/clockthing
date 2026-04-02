@@ -8,6 +8,7 @@ const args = process.argv.slice(1).map(arg => String(arg).trim().toLowerCase());
 const isScreensaverMode = args.some(arg => arg.startsWith('/s'));
 const isPreviewMode = args.some(arg => arg.startsWith('/p'));
 const isConfigMode = args.some(arg => arg.startsWith('/c'));
+const isWindowedMode = args.some(arg => arg === '--windowed' || arg.startsWith('/w'));
 
 const ALLOWED_THEMES = new Set(['light', 'dark', 'system']);
 const HEX_COLOR_REGEX = /^#[0-9a-f]{6}$/i;
@@ -87,12 +88,15 @@ function createWindow() {
   }
 
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: isWindowedMode ? 1200 : 800,
+    height: isWindowedMode ? 900 : 600,
+    minWidth: isWindowedMode ? 900 : undefined,
+    minHeight: isWindowedMode ? 650 : undefined,
     show: false,
-    fullscreen: true,
-    frame: false,
-    transparent: true,
+    fullscreen: isScreensaverMode || !isWindowedMode,
+    frame: isWindowedMode,
+    transparent: !isWindowedMode,
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -100,7 +104,9 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile('index.html', {
+    query: isWindowedMode ? { mode: 'windowed' } : {}
+  });
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });

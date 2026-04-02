@@ -150,6 +150,7 @@ let currentSettingsDialColor = '#e0f2fe'; // Default glacier
 
 const urlParams = new URLSearchParams(window.location.search);
 const isSettingsMode = urlParams.get('mode') === 'settings';
+const isWindowedMode = urlParams.get('mode') === 'windowed';
 
 if (isSettingsMode) {
     document.body.classList.add('settings-mode');
@@ -289,7 +290,7 @@ window.saveSettings = saveSettings;
 window.selectSettingsColor = selectSettingsColor;
 window.selectDialColor = selectDialColor;
 
-if (!isSettingsMode) {
+if (!isSettingsMode && !isWindowedMode) {
     document.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 't') {
             const current = document.body.getAttribute('data-theme');
@@ -318,6 +319,19 @@ if (!isSettingsMode) {
 
         if (dx > MOUSE_THRESHOLD || dy > MOUSE_THRESHOLD) {
             electronApi.quitApp();
+        }
+    });
+
+    initFace();
+    requestAnimationFrame(updateClock);
+}
+
+if (isWindowedMode) {
+    document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 't') {
+            const current = document.body.getAttribute('data-theme');
+            setTheme(current === 'light' ? 'dark' : 'light');
+            e.preventDefault();
         }
     });
 
