@@ -6,6 +6,9 @@
 
 To get a local copy up and running, follow these simple steps.
 
+### Settings of the screensaver
+![Settings Screenshot](settings_view.png)
+
 ### Prerequisites
 
 You need to have Node.js and npm installed on your system.
