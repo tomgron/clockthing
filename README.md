@@ -29,10 +29,24 @@ To start the screensaver, run the following command:
 npm start
 ```
 
+To quickly verify JavaScript syntax before packaging, run:
+
+```sh
+npm run check
+```
+
 To open the settings, run:
 
 ```sh
 npm run settings
+```
+
+Windows screensaver command switches are also supported:
+
+```sh
+electron . /s   # full screensaver mode
+electron . /c   # settings dialog
+electron . /p   # preview mode (currently exits)
 ```
 
 ## Building

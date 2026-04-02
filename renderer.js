@@ -5,6 +5,27 @@ window.addEventListener('unhandledrejection', function(event) {
    console.log("Unhandled Promise Rejection: " + event.reason);
 });
 
+const ALLOWED_THEMES = new Set(['light', 'dark', 'system']);
+const HEX_COLOR_REGEX = /^#[0-9a-f]{6}$/i;
+
+function normalizeTheme(theme) {
+    return ALLOWED_THEMES.has(theme) ? theme : 'dark';
+}
+
+function normalizeColor(color, fallback) {
+    return HEX_COLOR_REGEX.test(color) ? color : fallback;
+}
+
+function normalizeSettings(settings) {
+    const safe = settings && typeof settings === 'object' ? settings : {};
+
+    return {
+        theme: normalizeTheme(safe.theme),
+        color: normalizeColor(safe.color, '#cc2222'),
+        dialColor: normalizeColor(safe.dialColor, '#e0f2fe')
+    };
+}
+
 let electronApi;
 if (window.api) {
     electronApi = window.api;
@@ -122,13 +143,6 @@ const launchTime = Date.now();
 
 
 
-// Theme Logic
-function setTheme(theme) {
-    document.body.setAttribute('data-theme', theme);
-    // In normal mode we optimistically save to localstorage too
-    localStorage.setItem('clock-theme', theme);
-}
-
 // Settings Page Logic
 let currentSettingsTheme = 'dark';
 let currentSettingsColor = '#22d3ee'; // Default teal
@@ -139,33 +153,24 @@ const isSettingsMode = urlParams.get('mode') === 'settings';
 
 if (isSettingsMode) {
     document.body.classList.add('settings-mode');
-    electronApi.getSettings().then(settings => {
-        if (settings) {
-            if (settings.theme) selectSettingsTheme(settings.theme);
-            if (settings.color) selectSettingsColor(settings.color);
-            if (settings.dialColor) selectDialColor(settings.dialColor);
-        } else {
-            // Defaults
-            selectSettingsTheme('dark');
-            selectSettingsColor(currentSettingsColor);
-            selectDialColor(currentSettingsDialColor);
-        }
+    electronApi.getSettings().then(rawSettings => {
+        const settings = normalizeSettings(rawSettings);
+        selectSettingsTheme(settings.theme);
+        selectSettingsColor(settings.color);
+        selectDialColor(settings.dialColor);
     });
 } else {
     // Normal Mode
-    electronApi.getSettings().then(settings => {
-        let theme = 'dark';
-        let color = '#cc2222';
-        let dialColor = '#e0f2fe';
+    electronApi.getSettings().then(rawSettings => {
+        const fallbackTheme = normalizeTheme(localStorage.getItem('clock-theme'));
+        const fallbackColor = normalizeColor(localStorage.getItem('clock-color'), '#cc2222');
+        const fallbackDialColor = normalizeColor(localStorage.getItem('clock-dial-color'), '#e0f2fe');
 
-        if (settings) {
-            if (settings.theme) theme = settings.theme;
-            if (settings.color) color = settings.color;
-            if (settings.dialColor) dialColor = settings.dialColor;
-        } else {
-            // Fallback to local storage or defaults
-            theme = localStorage.getItem('clock-theme') || 'dark';
-        }
+        const hasPersistedSettings = rawSettings && typeof rawSettings === 'object';
+        const settings = normalizeSettings(rawSettings);
+        const theme = hasPersistedSettings ? settings.theme : fallbackTheme;
+        const color = hasPersistedSettings ? settings.color : fallbackColor;
+        const dialColor = hasPersistedSettings ? settings.dialColor : fallbackDialColor;
 
         setTheme(theme);
         setAccentColor(color);
@@ -174,10 +179,10 @@ if (isSettingsMode) {
 }
 
 function selectSettingsTheme(theme) {
-    currentSettingsTheme = theme;
+    currentSettingsTheme = normalizeTheme(theme);
     // Update UI
     document.querySelectorAll('.appearance-card').forEach(el => el.classList.remove('selected'));
-    const card = document.getElementById(`card-${theme}`);
+    const card = document.getElementById(`card-${currentSettingsTheme}`);
     if (card) card.classList.add('selected');
 
     // Show/hide dial color section based on theme
@@ -196,26 +201,26 @@ function selectSettingsTheme(theme) {
 }
 
 function selectSettingsColor(color) {
-    currentSettingsColor = color;
+    currentSettingsColor = normalizeColor(color, '#cc2222');
     // Update UI
     document.querySelectorAll('.lume-option').forEach(el => el.classList.remove('selected'));
     
-    const option = document.getElementById(`color-${color}`);
+    const option = document.getElementById(`color-${currentSettingsColor}`);
     if (option) {
         option.classList.add('selected');
     }
-    setAccentColor(color);
+    setAccentColor(currentSettingsColor);
 }
 
 function selectDialColor(color) {
-    currentSettingsDialColor = color;
+    currentSettingsDialColor = normalizeColor(color, '#e0f2fe');
     // Update UI
     document.querySelectorAll('.dial-option').forEach(el => el.classList.remove('selected'));
-    const option = document.getElementById(`dial-${color}`);
+    const option = document.getElementById(`dial-${currentSettingsDialColor}`);
     if (option) {
         option.classList.add('selected');
     }
-    setDialColor(color);
+    setDialColor(currentSettingsDialColor);
 }
 
 function resolveSystemTheme() {
@@ -226,30 +231,33 @@ function resolveSystemTheme() {
 }
 
 function setTheme(theme) {
-    let appliedTheme = theme;
-    if (theme === 'system') {
+    const normalizedTheme = normalizeTheme(theme);
+    let appliedTheme = normalizedTheme;
+    if (normalizedTheme === 'system') {
         appliedTheme = resolveSystemTheme();
     }
     document.body.setAttribute('data-theme', appliedTheme);
-    localStorage.setItem('clock-theme', theme);
+    localStorage.setItem('clock-theme', normalizedTheme);
 }
 
 function setAccentColor(color) {
-    const rgb = hexToRgb(color);
+    const safeColor = normalizeColor(color, '#cc2222');
+    const rgb = hexToRgb(safeColor);
     // Set global accent variables
-    document.documentElement.style.setProperty('--accent-color', color);
+    document.documentElement.style.setProperty('--accent-color', safeColor);
     document.documentElement.style.setProperty('--accent-rgb', rgb);
 
     // Also save to local storage for quick resume
-    localStorage.setItem('clock-color', color);
+    localStorage.setItem('clock-color', safeColor);
 }
 
 function setDialColor(color) {
-    const rgb = hexToRgb(color);
+    const safeColor = normalizeColor(color, '#e0f2fe');
+    const rgb = hexToRgb(safeColor);
     // Set dial color variables (used in light mode)
-    document.documentElement.style.setProperty('--dial-color', color);
+    document.documentElement.style.setProperty('--dial-color', safeColor);
     document.documentElement.style.setProperty('--dial-rgb', rgb);
-    localStorage.setItem('clock-dial-color', color);
+    localStorage.setItem('clock-dial-color', safeColor);
 }
 
 // Helper to convert hex to rgb for rgba usage

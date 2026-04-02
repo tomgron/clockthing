@@ -6,6 +6,7 @@
   "scripts": {
     "start": "electron .",
     "settings": "electron . /c",
+    "check": "node --check main.js && node --check preload.js && node --check renderer.js",
     "build": "electron-builder --win portable",
     "build:installer": "electron-builder --win nsis"
   },
@@ -26,11 +27,11 @@
     },
     "files": [
       "main.js",
+      "preload.js",
       "renderer.js",
       "index.html",
       "style.css",
-      "style_theme.css",
-      "style_new.css"
+      "style_theme.css"
     ],
     "win": {
       "target": [
