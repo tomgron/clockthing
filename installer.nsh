@@ -27,10 +27,10 @@
   copy_success:
     DetailPrint "Screensaver installed successfully to: $1"
     
-    ; Set the screensaver as active
+    ; Set the screensaver as active (don't override ScreenSaveTimeOut
+    ; so the user's existing timeout preference is preserved)
     WriteRegStr HKCU "Control Panel\Desktop" "SCRNSAVE.EXE" "$1"
     WriteRegStr HKCU "Control Panel\Desktop" "ScreenSaveActive" "1"
-    WriteRegStr HKCU "Control Panel\Desktop" "ScreenSaveTimeOut" "300"
     
     DetailPrint "Screensaver registry settings updated"
     Goto done

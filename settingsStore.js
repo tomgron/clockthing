@@ -44,7 +44,6 @@ async function writeSettings(app, settings) {
 
 module.exports = {
   DEFAULT_SETTINGS,
-  getConfigPath,
   readSettings,
   writeSettings
 };
